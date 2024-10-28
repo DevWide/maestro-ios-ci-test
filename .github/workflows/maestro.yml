@@ -16,30 +16,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Passo 2: Baixa e instala o Maestro CLI diretamente
+      # Passo 2: Baixa e instala o Maestro CLI diretamente em uma pasta conhecida
       - name: Install Maestro CLI
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
-          echo 'export PATH="$HOME/.maestro/bin:$PATH"' >> $GITHUB_ENV
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH  # Adiciona ao PATH diretamente
 
-      # Passo 3: Configura a API Key do Maestro
-      - name: Set Maestro API Key
-        env:
-          MAESTRO_API_KEY: ${{ secrets.MAESTRO_API_KEY }}
-        run: echo "MAESTRO_API_KEY=$MAESTRO_API_KEY" >> $GITHUB_ENV
-
-      # Passo 4: Login no Maestro Cloud (com o PATH atualizado)
+      # Passo 3: Login no Maestro Cloud usando a API Key
       - name: Login to Maestro Cloud
         env:
           MAESTRO_API_KEY: ${{ secrets.MAESTRO_API_KEY }}
-        run: |
-          source $GITHUB_ENV
-          maestro cloud login $MAESTRO_API_KEY
+        run: maestro cloud login $MAESTRO_API_KEY
 
-      # Passo 5: Executa os testes no Maestro Cloud
+      # Passo 4: Executa os testes no Maestro Cloud com o caminho correto dos arquivos
       - name: Run Tests on Maestro Cloud
         env:
           MAESTRO_API_KEY: ${{ secrets.MAESTRO_API_KEY }}
-        run: |
-          source $GITHUB_ENV
-          maestro cloud <appBinary> <flowFile>
+        run: maestro cloud "samples/sample.zip" "samples/ios-flow.yaml"
