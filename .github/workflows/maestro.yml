@@ -5,8 +5,6 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-  # Permite rodar o workflow manualmente
   workflow_dispatch:
 
 jobs:
@@ -18,17 +16,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Passo 2: Instala o Maestro CLI
+      # Passo 2: Baixa e instala o Maestro CLI
       - name: Install Maestro CLI
-        run: brew install maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
 
-      # Passo 3: Login no Maestro Cloud
-      - name: Login to Maestro Cloud
+      # Passo 3: Configura a API Key do Maestro
+      - name: Set Maestro API Key
         env:
           MAESTRO_API_KEY: ${{ secrets.MAESTRO_API_KEY }}
-        run: echo $MAESTRO_API_KEY | maestro login --api-key
+        run: echo "MAESTRO_API_KEY=$MAESTRO_API_KEY" >> $GITHUB_ENV
 
-      # Passo 4: Executa os testes no Maestro Cloud
+      # Passo 4: Login no Maestro Cloud
+      - name: Login to Maestro Cloud
+        run: maestro cloud login $MAESTRO_API_KEY
+
+      # Passo 5: Executa os testes no Maestro Cloud
       - name: Run Tests on Maestro Cloud
-        run: maestro cloud ./samples/sample.zip ./samples/ios-flow.yaml
-
+        run: maestro cloud <appBinary> <flowFile>
