@@ -1,0 +1,34 @@
+name: Maestro CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Permite rodar o workflow manualmente
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Passo 1: Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Passo 2: Instala o Maestro CLI
+      - name: Install Maestro CLI
+        run: brew install maestro
+
+      # Passo 3: Login no Maestro Cloud
+      - name: Login to Maestro Cloud
+        env:
+          MAESTRO_API_KEY: ${{ secrets.MAESTRO_API_KEY }}
+        run: echo $MAESTRO_API_KEY | maestro login --api-key
+
+      # Passo 4: Executa os testes no Maestro Cloud
+      - name: Run Tests on Maestro Cloud
+        run: maestro cloud ./samples/sample.zip ./samples/ios-flow.yaml
+
