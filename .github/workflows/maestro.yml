@@ -27,7 +27,7 @@ jobs:
 
       - name: Unzip Wikipedia.app
         run: |
-          unzip samples/wikipedia.zip -d samples
+          unzip -o -q samples/wikipedia.zip -d samples
           echo "Listing files in Wikipedia.app directory after unzip:"
           ls -R samples/Wikipedia.app
 
