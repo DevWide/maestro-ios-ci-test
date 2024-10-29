@@ -16,7 +16,9 @@ jobs:
       - name: Install Maestro CLI
         run: |
           curl -Ls "https://get.maestro.mobile.dev" | bash
-          export PATH="$PATH:$HOME/.maestro/bin"
+          echo "export PATH=\"$PATH:$HOME/.maestro/bin\"" >> $HOME/.bash_profile
+          source $HOME/.bash_profile
+          maestro --version # Verificar se o Maestro foi instalado corretamente
 
       - name: Start iOS Simulator
         run: |
@@ -27,6 +29,7 @@ jobs:
         env:
           MAESTRO_CLI_NO_ANALYTICS: "true"
         run: |
+          source $HOME/.bash_profile
           maestro test --format=JUNIT --output=maestro-test-report.xml samples/ios-advanced-flow.yaml
 
       - name: Upload Test Results
