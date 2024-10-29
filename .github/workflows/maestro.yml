@@ -1,38 +1,32 @@
-name: Maestro CI
+name: iOS CI Test with Maestro
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-
+    runs-on: macos-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Maestro CLI
-        run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
-          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
-
-      - name: List required files
-        run: |
-          echo "Listing files in the samples directory:"
-          ls -R samples
-
+        uses: actions/checkout@v2
+        
       - name: Unzip Wikipedia.app
         run: |
           unzip -o -q samples/wikipedia.zip -d samples
-          echo "Listing files in Wikipedia.app directory after unzip:"
-          ls -R samples/Wikipedia.app
 
-      - name: Run Tests Locally on GitHub Runner
-        env:
-          MAESTRO_CLI_NO_ANALYTICS: 1  # Para desativar analytics no CI
+      - name: Start iOS Simulator
         run: |
-          maestro test samples/ios-advanced-flow.yaml
+          xcrun simctl boot "iPhone 14"
+          sleep 30
+
+      - name: Run Maestro Tests
+        env:
+          MAESTRO_CLI_NO_ANALYTICS: "true"
+        run: |
+          maestro test --format=JUNIT --output=maestro-test-report.xml samples/ios-advanced-flow.yaml
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: maestro-test-report
+          path: maestro-test-report.xml
