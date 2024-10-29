@@ -6,7 +6,6 @@ tags:
 ---
 - runFlow: subflows/onboarding-ios.yaml
 
-# Dismiss the auth modal if visible
 - runFlow:
     when:
       visible: "You have been logged out"
