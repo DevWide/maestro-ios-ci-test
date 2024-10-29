@@ -13,6 +13,11 @@ jobs:
         run: |
           unzip -o -q samples/wikipedia.zip -d samples
 
+      - name: Install Maestro CLI
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          export PATH="$PATH:$HOME/.maestro/bin"
+
       - name: Start iOS Simulator
         run: |
           xcrun simctl boot "iPhone 14"
@@ -30,4 +35,3 @@ jobs:
         with:
           name: maestro-test-report
           path: maestro-test-report.xml
-
